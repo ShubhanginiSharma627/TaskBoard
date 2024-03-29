@@ -10,7 +10,10 @@ import tasks from "../data/tasks";
 import PersonIcon from '@mui/icons-material/Person';
 
 const TaskBoard = () => {
-  const [allTasks, setAllTasks] = useState(tasks);
+  const [allTasks, setAllTasks] = useState(() => {
+    const storedTasks = localStorage.getItem("tasks");
+    return storedTasks ? JSON.parse(storedTasks) : tasks;
+  });
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [openTaskForm, setOpenTaskForm] = useState(false);
   const [taskColumns, setTaskColumns] = useState([
@@ -21,14 +24,10 @@ const TaskBoard = () => {
     { status: "Deferred", tasks: [] },
   ]);
 
-  // Fetch tasks when component mounts
-  useEffect(() => {
-    setAllTasks(tasks);
-  }, []);
+  
 
   // Update filtered tasks whenever all tasks change
   useEffect(() => {
-    console.log("tasks updated",filteredTasks);
     setFilteredTasks(allTasks);
   }, [allTasks]);
 
@@ -57,7 +56,7 @@ const TaskBoard = () => {
 
   const addTask = (newTask) => {
     setAllTasks([...allTasks, newTask]);
-    setFilteredTasks([...filteredTasks, newTask]);
+    localStorage.setItem("tasks", JSON.stringify([...allTasks, newTask]));
   };
 
   const updateTask = (updatedTask) => {
@@ -70,6 +69,7 @@ const TaskBoard = () => {
     );
     setAllTasks(updatedAllTasks);
     setFilteredTasks(updatedFilteredTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedAllTasks));
   };
 
   const filterTasks = (filters) => {
@@ -109,12 +109,14 @@ const TaskBoard = () => {
       } else {
           return task;
       }
+      
   });
+  console.log("updatedAllTasks",updatedAllTasks)
 
   setAllTasks(updatedAllTasks);
-   
+  localStorage.setItem("tasks", JSON.stringify(updatedAllTasks));
   };
-
+ //console.log("column tasks",taskColumns)
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ minHeight: "100vh", paddingTop: "2rem", marginLeft: "2rem", marginRight: "2rem",paddingBottom:"2rem" }}>
