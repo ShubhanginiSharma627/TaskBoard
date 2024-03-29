@@ -10,7 +10,7 @@ import tasks from "../data/tasks";
 import PersonIcon from '@mui/icons-material/Person';
 
 const TaskBoard = () => {
-  const [allTasks, setAllTasks] = useState([]);
+  const [allTasks, setAllTasks] = useState(tasks);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [openTaskForm, setOpenTaskForm] = useState(false);
   const [taskColumns, setTaskColumns] = useState([
@@ -28,6 +28,7 @@ const TaskBoard = () => {
 
   // Update filtered tasks whenever all tasks change
   useEffect(() => {
+    console.log("tasks updated",filteredTasks);
     setFilteredTasks(allTasks);
   }, [allTasks]);
 
@@ -60,6 +61,7 @@ const TaskBoard = () => {
   };
 
   const updateTask = (updatedTask) => {
+
     const updatedAllTasks = allTasks.map((task) =>
       task.id === updatedTask.id ? updatedTask : task
     );
@@ -92,36 +94,25 @@ const TaskBoard = () => {
   };
 
   const handleDrop = (item, columnStatus) => {
-    console.log("col",columnStatus);
     const { id, sourceStatus } = item;
     if (sourceStatus !== columnStatus) {
+      
       onUpdateTask(id, columnStatus);
     }
   };
 
   const onUpdateTask = (taskId, newStatus) => {
-
-    const updatedTaskColumns = taskColumns.map(column => ({
-      ...column,
-      tasks: column.tasks.map(task => {
-        if (task.id === taskId) {
-          return { ...task, status: newStatus };
-        } else {
-          return task;
-        }
-      })
-    }));
-
-    setTaskColumns(updatedTaskColumns);
-    const updatedFilteredTasks = filteredTasks.map(task => {
+    const updatedAllTasks = allTasks.map(task => {
+      console.log("task",task.id)
       if (task.id === taskId) {
-        return { ...task, status: newStatus };
+          return { ...task, status: newStatus };
       } else {
-        return task;
+          return task;
       }
-    });
-  
-    setFilteredTasks(updatedFilteredTasks);
+  });
+
+  setAllTasks(updatedAllTasks);
+   
   };
 
   return (
