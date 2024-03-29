@@ -113,7 +113,7 @@ const TaskColumn = ({ status, tasks, onUpdateTask, bgcolor, onDeleteTask }) => {
                                 <TaskForm open={openTaskForm} onClose={() => setOpenTaskForm(false)} onUpdateTask={onUpdateTask} initialTask={task} />
                                 <Box sx={{ display: "flex", marginY: "1rem" }}>
                                     <Button ref={anchorRef} variant="contained" onClick={handleClick}>
-                                        {selectedStatus || "Status"}
+                                        {selectedStatus ==="Pending"?"Assign":selectedStatus}
                                     </Button>
                                     <Menu
                                         anchorEl={anchorRef.current}
