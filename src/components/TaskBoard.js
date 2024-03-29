@@ -14,6 +14,12 @@ const TaskBoard = () => {
     const storedTasks = localStorage.getItem("tasks");
     return storedTasks ? JSON.parse(storedTasks) : tasks;
   });
+  const[filters,setFilters]= useState({
+    assignee: undefined,
+    priority: "",
+    startDate: "",
+    endDate: "",
+  });
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [openTaskForm, setOpenTaskForm] = useState(false);
   const [taskColumns, setTaskColumns] = useState([
@@ -28,11 +34,13 @@ const TaskBoard = () => {
 
   // Update filtered tasks whenever all tasks change
   useEffect(() => {
-    setFilteredTasks(allTasks);
+    filterTasks(filters);
   }, [allTasks]);
 
   useEffect(() => {
+    
     const updateColumnsTasks = () => {
+      
       setTaskColumns(prevColumns => {
         return prevColumns.map(column => ({
           ...column,
@@ -84,13 +92,38 @@ const TaskBoard = () => {
       const taskAssignee = task.assignee ? task.assignee.toLowerCase().trim().replace(/\s/g, '') : '';
       const isAssigneeMatch = !assignee || taskAssignee.includes(assigneeLowerCase);
       const isPriorityMatch = !priority || task.priority === priority;
+      const taskStartDate = new Date(task.startDate);
+      const filterStartDate = new Date(startDate);
       const isStartDateMatch =
-        !startDate || task.startDate >= startDate;
-
-      const isEndDateMatch = !endDate || task.startDate <= endDate;
+        !startDate ||
+        new Date(
+          taskStartDate.getFullYear(),
+          taskStartDate.getMonth(),
+          taskStartDate.getDate()
+        ) >=
+          new Date(
+            filterStartDate.getFullYear(),
+            filterStartDate.getMonth(),
+            filterStartDate.getDate()
+          );
+     
+      const filterEndDate = new Date(endDate);
+      const isEndDateMatch =
+        !endDate ||
+        new Date(
+          taskStartDate.getFullYear(),
+          taskStartDate.getMonth(),
+          taskStartDate.getDate()
+        ) <=
+          new Date(
+            filterEndDate.getFullYear(),
+            filterEndDate.getMonth(),
+            filterEndDate.getDate()
+          );
       return isAssigneeMatch && isPriorityMatch && isStartDateMatch && isEndDateMatch;
     });
     setFilteredTasks(filtered);
+    setFilters(filters);
   };
 
   const handleDrop = (item, columnStatus) => {
@@ -102,19 +135,18 @@ const TaskBoard = () => {
   };
 
   const onUpdateTask = (taskId, newStatus) => {
-    const updatedAllTasks = allTasks.map(task => {
-      console.log("task",task.id)
-      if (task.id === taskId) {
+    setAllTasks(prevAllTasks => {
+      const updatedAllTasks = prevAllTasks.map(task => {
+        if (task.id === taskId) {
           return { ...task, status: newStatus };
-      } else {
+        } else {
           return task;
-      }
-      
-  });
-  console.log("updatedAllTasks",updatedAllTasks)
-
-  setAllTasks(updatedAllTasks);
-  localStorage.setItem("tasks", JSON.stringify(updatedAllTasks));
+        }
+      });
+      console.log("updatedAllTasks", updatedAllTasks);
+      localStorage.setItem("tasks", JSON.stringify(updatedAllTasks));
+      return updatedAllTasks;
+    });
   };
  //console.log("column tasks",taskColumns)
   return (

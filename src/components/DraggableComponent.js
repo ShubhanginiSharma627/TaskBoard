@@ -9,7 +9,9 @@ const DraggableComponent = ({ id, status, children }) => {
       isDragging: !!monitor.isDragging(),
     }),
   }));
-
+  if(isDragging){
+    console.log("the item is dragging is",id)
+  }
   return (
     <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
       {children}
